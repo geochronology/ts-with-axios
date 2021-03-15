@@ -22,7 +22,8 @@ const App: React.FC = () => {
       .get<IPost[]>("https://jsonplaceholder.typicode.com/posts", {
         headers: {
           "Content-Type": "application/json"
-        }
+        },
+        timeout: 3 /* in ms */
       })
       .then(res => {
         setPosts(res.data)
@@ -30,9 +31,11 @@ const App: React.FC = () => {
       })
       .catch(ex => {
         const err =
-          ex.response.status === 404
-            ? "Resource not found"
-            : "An unexpected error has occurred";
+          ex.code === "ECONNABORTED"
+            ? "A timeout has occurred"
+            : ex.response.status === 404
+              ? "Resource not found"
+              : "An unexpected error has occurred";
         setError(err);
         setLoading(false);
       })
